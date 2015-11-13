@@ -6,6 +6,22 @@ app.config(function($stateProvider, $urlRouterProvider) {
 	$urlRouterProvider.otherwise('/threads')
 
 	$stateProvider
+		.state('logout', {
+			url: '/logout',
+			controller: function(userService) {
+				return userService.logout();
+			},
+		})
+		.state('login', {
+			url: '/login',
+			controller: 'loginCtrl',
+			templateUrl: 'login/login.html',
+		})
+		.state('signup', {
+			url: '/signup',
+			controller: 'signupCtrl',
+			templateUrl: 'signup/signup.html',
+		})
 		.state('threads', {
 			url:'/threads',
 			templateUrl: 'threads/threads.html',

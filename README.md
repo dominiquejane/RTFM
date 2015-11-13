@@ -247,3 +247,58 @@ It should look like this,
 ```
 
 Notice that we've added a new ```$scope.createComment``` function. This will get called from the ```thread.html``` view and adds a comment to your AngularFire ```comments``` "array".
+
+Step 1: Prepare the app
+
+You need to go to your Firebase app and enable authentication. For this app we're going to enable email/password authentication. Head over to your Firebase dashboard and configure the email/password authentication piece.
+
+Once that's finished, add these additional routes to your app:
+
+Login
+
+State: login Url: '/login' controller: 'loginCtrl' templateUrl: 'login.html'
+
+Signup
+
+State: signup Url: '/signup' controller: 'signupCtrl' templateUrl: 'signup.html'
+
+Step 2: Create and set up the userService
+
+We're going to utilize a service to manage our authentication for us. Create a userService and add the following methods:
+
+getUser (returns the $getAuth() result)
+register (returns the $createUser(newUser) result)
+login (returns the authWithPassword(user) result)
+Above your service methods, create an authRef (using Firebase) and an auth object (using $firebaseAuth). This should look something like this:
+
+var authRef = new Firebase(firebaseUrl.url);
+var auth = $firebaseAuth(authRef);
+Step 3: Wire up the login and signup states
+
+In your signup controller, create a $scope.register method that calls the userService's register method. You'll need to pass in the new user object (including email and password) into this method. Be sure you have the inputs and ng-models necessary in your view to accomplish this.
+
+In the login controller, create a $scope.login method that calls the userService's login method. You'll need to pass in the user object (including email and password) from the view into this method. Be sure you have the inputs and ng-models necessary in your view to accomplish this. If the login succeeds, call $state.go to redirect the user to the threads page.
+
+Step 4 (going further): Handle logging out
+
+We're going to use a nifty ability in routing to create a logout app.
+
+.state('logout', {
+    url: '/logout',
+    controller: function(UserService) {
+        return userService.logout();
+    },
+})
+See what we're doing? The only purpose of this route state is to call the userService.logout method.
+
+this.logout = function(user) {
+    return auth.$unauth();
+}
+You're also going to want to watch the $onAuth in the userService so we can send the user to the correct view when they're not logged in.
+
+auth.$onAuth(function(authData) {
+    if (!authData) {
+        $state.go('login')
+    }
+});
+If you want another challenge, create a "logout" directive that checks the userService for the user's auth status and shows a Log out link if appropriate. This directive could be placed anywhere in your app and would allow the user to see their current state and log out.

@@ -1,4 +1,12 @@
-angular.module('rtfmApp').controller('threadsCtrl', function($scope, threadsRef, $firebaseArray) {
+angular.module('rtfmApp').controller('threadsCtrl', function($scope, threadsRef, $firebaseArray, userService, $state) {
+
+	if (!userService.getAuth()) {
+		$state.go('login');
+	}
+	
+	$scope.logout = function() {
+		userService.logout();
+	}
 
 	$scope.threads = $firebaseArray(threadsRef);
 
